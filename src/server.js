@@ -6,8 +6,9 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import pagosRoutes from "./routes/pagosRoutes.js";
 import User from "./models/User.js";
-
-dotenv.config();
+import progresoRoutes from "./routes/progresoRoutes.js";
+import streakRoutes from "./routes/streakRoutes.js";
+import beneficioRoutes from "./routes/beneficio.routes.js";
 connectDB();
 
 const app = express();
@@ -17,6 +18,9 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/pagos", pagosRoutes);
+app.use("/api/progreso", progresoRoutes);
+app.use("/api/streak", streakRoutes);
+app.use(beneficioRoutes);
 
 app.get("/", (req, res) => {
   res.send("Servidor funcionando");
