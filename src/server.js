@@ -2,9 +2,11 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import bcrypt from "bcryptjs";
+
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import pagosRoutes from "./routes/pagosRoutes.js";
+import reservationsRoutes from "./routes/reservations.routes.js";
 import User from "./models/User.js";
 
 dotenv.config();
@@ -17,6 +19,7 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/pagos", pagosRoutes);
+app.use("/api/reservations", reservationsRoutes);
 
 app.get("/", (req, res) => {
   res.send("Servidor funcionando");
