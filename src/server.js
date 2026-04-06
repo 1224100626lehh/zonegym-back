@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import helmet from 'helmet';
 import bcrypt from "bcryptjs";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -15,12 +16,20 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+app.use(helmet());
+
 app.use(cors({
   origin: "https://zonegym-frontend-production.up.railway.app",
   credentials: true
 }));
 
 app.use(express.json());
+
+app.post("/api/comentarios", (req, res) => {
+  const { texto } = req.body;
+  res.json({ comentario: texto });
+});
 
 app.use("/api/users", userRoutes);
 app.use("/api/pagos", pagosRoutes);
