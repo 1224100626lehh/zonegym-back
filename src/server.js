@@ -12,6 +12,9 @@ import progresoRoutes from "./routes/progresoRoutes.js";
 import streakRoutes from "./routes/streakRoutes.js";
 import beneficioRoutes from "./routes/beneficio.routes.js";
 import { usuarioRoutes } from "./routes/usuarios.js";
+import rateLimit from "express-rate-limit";
+import { body, validationResult } from "express-validator";
+import { filterXSS as xss } from "xss";
 
 dotenv.config();
 connectDB();
@@ -27,10 +30,35 @@ app.use(cors({
 
 app.use(express.json());
 
-app.post("/api/comentarios", (req, res) => {
-  const { texto } = req.body;
-  res.json({ comentario: texto });
+const comentarioLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuto
+  max: 10,
+  message: { error: "Demasiadas peticiones, espera un minuto." },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
+
+app.post(
+  "/api/comentarios",
+  comentarioLimiter,
+  [
+    body("texto")
+      .notEmpty().withMessage("El texto es obligatorio")
+      .isLength({ max: 200 }).withMessage("El texto no puede superar 200 caracteres"),
+    body("puntuacion")
+      .notEmpty().withMessage("La puntuación es obligatoria")
+      .isInt().withMessage("La puntuación debe ser un número entero"),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errores: errors.array() });
+    }
+    const texto = xss(req.body.texto);
+    const puntuacion = req.body.puntuacion;
+    res.json({ comentario: texto, puntuacion });
+  }
+);
 
 app.use("/api/users", userRoutes);
 app.use("/api/pagos", pagosRoutes);
