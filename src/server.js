@@ -11,6 +11,7 @@ import User from "./models/User.js";
 import progresoRoutes from "./routes/progresoRoutes.js";
 import streakRoutes from "./routes/streakRoutes.js";
 import beneficioRoutes from "./routes/beneficio.routes.js";
+import { usuarioRoutes } from "./routes/usuarios.js";
 
 dotenv.config();
 connectDB();
@@ -20,7 +21,7 @@ const app = express();
 app.use(helmet());
 
 app.use(cors({
-  origin: "https://zonegym-frontend-production.up.railway.app",
+  origin: "http://localhost:5173",
   credentials: true
 }));
 
@@ -37,6 +38,7 @@ app.use("/api/progreso", progresoRoutes);
 app.use("/api/streak", streakRoutes);
 app.use(beneficioRoutes);
 app.use("/api/reservations", reservationsRoutes);
+usuarioRoutes(app);
 
 app.get("/", (req, res) => {
   res.send("Servidor funcionando");
