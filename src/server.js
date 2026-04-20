@@ -17,6 +17,9 @@ import { body, validationResult } from "express-validator";
 import { filterXSS as xss } from "xss";
 
 dotenv.config();
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {}
+}
 connectDB();
 
 const app = express();
@@ -26,7 +29,7 @@ app.use(helmet());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://zonegym-frontend.onrender.com" // ← la URL que te dará Render para el frontend
+    "https://zonegym-front.onrender.com"
   ],
   credentials: true
 }));
@@ -62,6 +65,16 @@ app.post(
     res.json({ comentario: texto, puntuacion });
   }
 );
+
+const apiKeyMiddleware = (req, res, next) => {
+  const apiKey = req.headers['x-api-key']
+  if (!apiKey || apiKey !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'API Key inválida o ausente' })
+  }
+  next()
+}
+
+app.use('/api', apiKeyMiddleware)
 
 app.use("/api/users", userRoutes);
 app.use("/api/pagos", pagosRoutes);
