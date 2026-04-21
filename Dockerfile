@@ -9,5 +9,9 @@ COPY . .
 FROM node:20-alpine
 WORKDIR /app
 COPY --from=builder /app .
-EXPOSE 5000
+
+# No exponer puerto fijo, usar variable de entorno
+ENV PORT=5000
+ENV NODE_ENV=production
+
 CMD ["node", "src/server.js"]
